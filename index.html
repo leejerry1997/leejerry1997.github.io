@@ -16,14 +16,14 @@ body {
 
 ul {
     list-style-type: none;
-    margin: 0;
+    margin-left: 150px;
+	margin-right: 150px;
     padding: 0;
     overflow: hidden;
-    background-color: #333;
+    background-color: rgba(3, 3, 3, 0.5);
 	position: -webkit-sticky; /* Safari */
 	position: sticky;
 	top: 0;
-	width: 100%;
 }
 
 li {
@@ -44,7 +44,7 @@ li a {
 }
 
 li a:hover:not(.active) {
-    background-color: rgb(1, 1, 1);
+    background-color: rgba(1, 1, 1, 1);
 }
 
 .active {
@@ -53,6 +53,20 @@ li a:hover:not(.active) {
 
 .header {
     background-color: rgba(255, 255, 255, 0.5);
+	margin-left: 150px;
+	margin-right: 150px;
+	margin-top: 50px;
+	margin-bottom: 20px;
+	padding: 20px;
+}
+
+.bodycontent {
+	padding: 20px;
+	margin-top: 30px;
+	height: 1500px;
+	background-color: rgba(255, 255, 255, 0.5);
+	margin-left: 150px;
+	margin-right: 150px;
 }
 </style>
 </head>
@@ -70,7 +84,7 @@ li a:hover:not(.active) {
   <li style="float:right"><a href="#about">About</a></li>
 </ul>
 
-<div style="padding:20px;margin-top:30px;height:1500px;background-color: rgba(255, 255, 255, 0.5);">
+<div class="bodycontent">
 <p>I'm hosted with GitHub Pages.</p>
 <p> <a href="/" target="_blank">The home page will open in another tab.</a> </p>
 </div>
