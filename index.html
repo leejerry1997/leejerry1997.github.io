@@ -6,7 +6,13 @@ This is the title.
 <head>
 <style>
 body {
+	background-image: url("img_background.jpg");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-attachment: fixed;
+	background-size: cover;
 }
+
 
 ul {
     list-style-type: none;
@@ -38,11 +44,15 @@ li a {
 }
 
 li a:hover:not(.active) {
-    background-color: #111;
+    background-color: rgb(1, 1, 1);
 }
 
 .active {
     background-color: #4CAF50;
+}
+
+.header {
+    background-color: rgba(255, 255, 255, 0.5);
 }
 </style>
 </head>
@@ -60,7 +70,7 @@ li a:hover:not(.active) {
   <li style="float:right"><a href="#about">About</a></li>
 </ul>
 
-<div style="padding:20px;margin-top:30px;background-color:#1abc9c;height:1500px;">
+<div style="padding:20px;margin-top:30px;height:1500px;background-color: rgba(255, 255, 255, 0.5);">
 <p>I'm hosted with GitHub Pages.</p>
 <p> <a href="/" target="_blank">The home page will open in another tab.</a> </p>
 </div>
