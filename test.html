@@ -84,6 +84,7 @@ li a:hover:not(.active) {
 .Dcanvas {
 	border:1px solid #d3d3d3;
 	background-color: rgba(255, 255, 255, 1);
+	cursor: crosshair;
 }
 </style>
 </head>
@@ -110,49 +111,80 @@ li a:hover:not(.active) {
 <script>
 var canvas = document.getElementById("drawCanvas");
 var ctx = canvas.getContext('2d');
+var delta = 20;
 
 canvas.addEventListener('mousedown', startDraw, false);
 canvas.addEventListener('mousemove', draw, false);
 canvas.addEventListener('mouseup', endDraw, false);
 
-var isActive = false;
+var isActive = 0;
+var drawType = 'pen';
 
 var plots = [];
 
+function changeType(type)
+{
+  drawType = type;
+  //document.getElementById("logx").innerHTML = drawType;
+}
+
 function drawOnCanvas(color,plots)
 {
-  ctx.beginPath();
-  ctx.strokeStyle = color;
-  ctx.moveTo(plots[0].x, plots[0].y);
-  
-  for(var i=1; i<plots.length; i++)
+  var i = 0;
+  if(isActive == 1)
   {
-    ctx.lineTo(plots[i].x, plots[i].y);
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.moveTo(plots[0].x, plots[0].y);
+
+    for(i=1; i<plots.length; i++)
+    {
+      ctx.lineTo(plots[i].x, plots[i].y);
+    }
+    ctx.stroke();
   }
-  ctx.stroke();
 }
 
 function draw(e)
 {
-  if(!isActive) return;
+  if(isActive == 0) return;
+  if(e.which == 0) 
+  {
+    endDraw(e);
+	return;
+  }
+  else if(e.which != isActive)
+  {
+    endDraw(e);
+	startDraw(e);
+  }
+  
+  //document.getElementById("logx").innerHTML = e.which;
   
   var Cordx = e.offsetX || e.layerX - canvas.offsetLeft;
   var Cordy = e.offsetY || e.layerY - canvas.offsetTop;
   
+  if(isActive == 1)
+  {
+    plots.push({x: Cordx, y: Cordy});
   
-  plots.push({x: Cordx, y: Cordy});
-  
-  drawOnCanvas("#ff0000",plots);
+    drawOnCanvas("#ff0000",plots);
+  }
+  else if(isActive == 3)
+  {
+	ctx.clearRect(Cordx-delta, Cordy-delta, 2* delta, 2*delta);
+  }
 }
 
 function startDraw(e)
 {
-  isActive = true;
+  isActive = e.which;
+  //document.getElementById("logx").innerHTML = isActive;
 }
 
 function endDraw(e)
 {
-  isActive = false;
+  isActive = 0;
   
   plots = [];
 }
