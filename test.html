@@ -80,8 +80,14 @@ li a:hover:not(.active) {
 	margin-bottom: 50px;
 	font-size: 20px;
 }
+
+.Dcanvas {
+	border:1px solid #d3d3d3;
+	background-color: rgba(255, 255, 255, 1);
+}
 </style>
 </head>
+
 
 <body>
 <div class="header">
@@ -90,21 +96,67 @@ li a:hover:not(.active) {
 
 <ul>
   <li><a href="index.html">Home</a></li>
-  <li><a href="">TEST</a></li>
+  <li><a class="active" href="test.html">TEST</a></li>
   <li><a href="#3">tan(&pi;/2)</a></li>
   <li><a href="#4">tan(&pi;/2)</a></li>
-  <li style="float:right"><a class="active" href="">About</a></li>
+  <li style="float:right"><a href="">About</a></li>
 </ul>
 
 <div class="bodycontent">
-<h2>About the webpage</h2>
-<p>I'm hosted with GitHub Pages.</p>
-<p>Background image: <a href="https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62319310" target="_blank">流星群</a> by Pixiv <a href="https://www.pixiv.net/member.php?id=16154485" target="_blank">@CZY</a></p>
 
-<br/>
-<h2>About me</h2>
-<p>Jerry</p>
-<p>Email: <a href="mailto:leejerry1997@hotmail.com">leejerry1997@hotmail.com</a></p>
+<canvas class="Dcanvas" id="drawCanvas" height="600" width="800">
+</canvas>
+
+<script>
+var canvas = document.getElementById("drawCanvas");
+var ctx = canvas.getContext('2d');
+
+canvas.addEventListener('mousedown', startDraw, false);
+canvas.addEventListener('mousemove', draw, false);
+canvas.addEventListener('mouseup', endDraw, false);
+
+var isActive = false;
+
+var plots = [];
+
+function drawOnCanvas(color,plots)
+{
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.moveTo(plots[0].x, plots[0].y);
+  
+  for(var i=1; i<plots.length; i++)
+  {
+    ctx.lineTo(plots[i].x, plots[i].y);
+  }
+  ctx.stroke();
+}
+
+function draw(e)
+{
+  if(!isActive) return;
+  
+  var Cordx = e.offsetX || e.layerX - canvas.offsetLeft;
+  var Cordy = e.offsetY || e.layerY - canvas.offsetTop;
+  
+  
+  plots.push({x: Cordx, y: Cordy});
+  
+  drawOnCanvas("#ff0000",plots);
+}
+
+function startDraw(e)
+{
+  isActive = true;
+}
+
+function endDraw(e)
+{
+  isActive = false;
+  
+  plots = [];
+}
+</script>
 
 </div>
 
