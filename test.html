@@ -97,6 +97,7 @@ li a:hover:not(.active) {
 .navbar a {
     float: left;
     color: white;
+    background-color: rgba(64, 64, 64, 1);
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
@@ -111,7 +112,7 @@ li a:hover:not(.active) {
 }
 
 .dropdown .dropbtn {
-  font-size: 16px;
+  font-size: inherit;
   border: none;
   outline: none;
   color: white;
@@ -123,14 +124,32 @@ li a:hover:not(.active) {
   cursor: pointer;
 }
 
-
-
 .dropdown-content {
 	display:none;
 	position: absolute;
 	background-color: rgba(255. 255, 255, 1);
 	box-shadow: 0px 8px 16px 0px rgba(0,0,0,1);
 	z-index: 1;
+}
+
+.dropdownBtn {
+  display: block;
+  font-size: inherit;
+  border: none;
+  outline: none;
+  background-color: rgba(200, 200, 200, 1);
+  color: black;
+  text-align: center;
+  margin: 0px;
+  overflow: hidden;
+  padding: 14px 16px;
+  transition: 0.3s;
+  cursor: pointer;
+  width: 300px;
+}
+
+.dropdownBtn:hover {
+  background-color: red;
 }
 
 .dropdown:hover {
@@ -145,11 +164,28 @@ li a:hover:not(.active) {
     background-color: rgba(0,0,0,1);
 }
 
+.navbar a.active {
+    background-color: #4CAF50;
+}
 .clrPicker {
 	margin: auto;
-	border:1px solid #d3d3d3;
 	background-color: rgba(255, 255, 255, 1);
 	cursor: crosshair;
+}
+
+.showClr {
+  float: right;
+  overflow: hidden;
+  font-size: inherit;
+  border: none;
+  outline: none;
+  color: white;
+  padding: 14px 16px;
+  background-color: black;
+  font-family: inherit;
+  margin: 0;
+  border-left: 1px solid #bbb;
+  cursor: pointer;
 }
 </style>
 </head>
@@ -169,13 +205,18 @@ li a:hover:not(.active) {
 </ul>
 
 <div class="bodycontent">
+
+
 <div class="navbar">
-  <a id='pen' onclick="changeType('pen');" class="active">Pen</a>
-  <a id='line' onclick="changeType('line');">Line</a>
+  <a id='pen' onclick="changeType(1);" class="active">Pen</a>
+  <a id='eraser' onclick="changeType(-1);">Eraser</a>
+  <a id='clear' onclick="clearAll();">Clear</a>
+  <div class="showClr" id="clrShow" onclick="resetClr();">Reset Current Color</div>
   <div class="dropdown">
     <button class="dropbtn" id="colorBtn">Color</button>
     <div class="dropdown-content">
 	  <canvas class="clrPicker" id="palette" height="200" width="300"></canvas>
+	  <button class="dropdownBtn" onclick="resetClr();">Reset Color</button>
 	</div>
   </div>
   
@@ -221,17 +262,32 @@ function beginPick(e)
 function viewClr(e)
 {
   if(!isHold) return;
+  if(e.which != 1)
+  {
+    endPick(e);
+	return;
+  }
   
   var Cordx = e.offsetX || e.layerX - palette.offsetLeft;
   var Cordy = e.offsetY || e.layerY - palette.offsetTop;
   var imgClr = ptx.getImageData(Cordx, Cordy, 1, 1);
   clr = 'rgb(' + imgClr.data[0] + ', ' + imgClr.data[1] + ', ' + imgClr.data[2] + ')';
-  document.getElementById("colorBtn").style.color = clr;
+  var oppClr = 'rgb(' + (255-imgClr.data[0]) + ', ' + (255-imgClr.data[1]) + ', ' + (255-imgClr.data[2]) + ')';
+  
+  document.getElementById("clrShow").style.color = oppClr;
+  document.getElementById("clrShow").style.backgroundColor = clr;
 }
 
 function endPick(e)
 {
   isHold = false;
+}
+
+function resetClr()
+{
+  clr="black";
+  document.getElementById("clrShow").style.color = "white";
+  document.getElementById("clrShow").style.backgroundColor = "black";
 }
 </script>
 
@@ -248,14 +304,29 @@ canvas.addEventListener('mousemove', draw, false);
 canvas.addEventListener('mouseup', endDraw, false);
 
 var isActive = 0;
-var drawType = 'pen';
+var drawMode = 1;
 
 var plots = [];
 
+function clearAll()
+{
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  changeType(1);
+}
+
 function changeType(type)
 {
-  drawType = type;
-  //document.getElementById("logx").innerHTML = drawType;
+  drawMode = type;
+  document.getElementById('pen').className = "";
+  document.getElementById('eraser').className = "";
+  if(type == 1)
+  {
+    document.getElementById('pen').className = "active";
+  }
+  else if(type == -1)
+  {
+    document.getElementById('eraser').className = "active";
+  }
 }
 
 function drawOnCanvas(plots)
@@ -296,9 +367,16 @@ function draw(e)
   
   if(isActive == 1)
   {
-    plots.push({x: Cordx, y: Cordy});
+    if(drawMode == 1)
+	{
+      plots.push({x: Cordx, y: Cordy});
   
-    drawOnCanvas(plots);
+      drawOnCanvas(plots);
+	}
+	else if(drawMode == -1)
+	{
+	  ctx.clearRect(Cordx-delta, Cordy-delta, 2* delta, 2*delta);
+	}
   }
   else if(isActive == 3)
   {
