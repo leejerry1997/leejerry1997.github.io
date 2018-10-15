@@ -86,6 +86,71 @@ li a:hover:not(.active) {
 	background-color: rgba(255, 255, 255, 1);
 	cursor: crosshair;
 }
+
+.navbar {
+	width: 800px;
+    overflow: hidden;
+    background-color: rgba(64, 64, 64, 1);
+	top: 0;
+}
+
+.navbar a {
+    float: left;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+	transition: 0.3s;
+	border-right: 1px solid #bbb;
+	cursor: pointer;
+}
+
+.dropdown {
+  float: right;
+  overflow: hidden;
+}
+
+.dropdown .dropbtn {
+  font-size: 16px;
+  border: none;
+  outline: none;
+  color: white;
+  padding: 14px 16px;
+  background-color: inherit;
+  font-family: inherit;
+  margin: 0;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+
+
+.dropdown-content {
+	display:none;
+	position: absolute;
+	background-color: rgba(255. 255, 255, 1);
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,1);
+	z-index: 1;
+}
+
+.dropdown:hover {
+   background-color: rgba(0,0,0,1);
+ }
+
+.dropdown:hover .dropdown-content {
+	display: block;
+}
+
+.navbar a:hover:not(.active){
+    background-color: rgba(0,0,0,1);
+}
+
+.clrPicker {
+	margin: auto;
+	border:1px solid #d3d3d3;
+	background-color: rgba(255, 255, 255, 1);
+	cursor: crosshair;
+}
 </style>
 </head>
 
@@ -104,8 +169,73 @@ li a:hover:not(.active) {
 </ul>
 
 <div class="bodycontent">
+<div class="navbar">
+  <a id='pen' onclick="changeType('pen');" class="active">Pen</a>
+  <a id='line' onclick="changeType('line');">Line</a>
+  <div class="dropdown">
+    <button class="dropbtn" id="colorBtn">Color</button>
+    <div class="dropdown-content">
+	  <canvas class="clrPicker" id="palette" height="200" width="300"></canvas>
+	</div>
+  </div>
+  
+</div>
 
-<canvas class="Dcanvas" id="drawCanvas" height="900" width="1450">
+<script>
+var palette = document.getElementById("palette");
+var ptx = palette.getContext('2d');
+
+var isHold = false;
+var clr = "black";
+
+var gradient = ptx.createLinearGradient(0,0,palette.width,0);
+gradient.addColorStop(0,"rgb(255,0,0)");
+gradient.addColorStop(0.17,"rgb(255,0,255)");
+gradient.addColorStop(0.34,"rgb(0,0,255)");
+gradient.addColorStop(0.50,"rgb(0,255,255)");
+gradient.addColorStop(0.66,"rgb(0,255,0)");
+gradient.addColorStop(0.84,"rgb(255,255,0)");
+gradient.addColorStop(1,"rgb(255,0,0)");
+
+ptx.fillStyle = gradient;
+ptx.fillRect(0,0,palette.width,palette.height);
+
+gradient = ptx.createLinearGradient(0,0,0,palette.height);
+gradient.addColorStop(0, "rgba(255, 255, 255, 1)");
+gradient.addColorStop(0.5, "rgba(255, 255, 255, 0)");
+gradient.addColorStop(0.5, "rgba(0, 0, 0, 0)");
+gradient.addColorStop(1, "rgba(0, 0, 0, 1)");
+
+ptx.fillStyle = gradient;
+ptx.fillRect(0,0,palette.width,palette.height);
+
+palette.addEventListener("mousedown", beginPick, false);
+palette.addEventListener("mousemove", viewClr, false);
+palette.addEventListener("mouseup", endPick, false);
+
+function beginPick(e)
+{
+  if(e.which == 1) isHold = true;
+}
+
+function viewClr(e)
+{
+  if(!isHold) return;
+  
+  var Cordx = e.offsetX || e.layerX - palette.offsetLeft;
+  var Cordy = e.offsetY || e.layerY - palette.offsetTop;
+  var imgClr = ptx.getImageData(Cordx, Cordy, 1, 1);
+  clr = 'rgb(' + imgClr.data[0] + ', ' + imgClr.data[1] + ', ' + imgClr.data[2] + ')';
+  document.getElementById("colorBtn").style.color = clr;
+}
+
+function endPick(e)
+{
+  isHold = false;
+}
+</script>
+
+<canvas class="Dcanvas" id="drawCanvas" height="600" width="800">
 </canvas>
 
 <script>
@@ -128,13 +258,13 @@ function changeType(type)
   //document.getElementById("logx").innerHTML = drawType;
 }
 
-function drawOnCanvas(color,plots)
+function drawOnCanvas(plots)
 {
   var i = 0;
   if(isActive == 1)
   {
     ctx.beginPath();
-    ctx.strokeStyle = color;
+    ctx.strokeStyle = clr;
     ctx.moveTo(plots[0].x, plots[0].y);
 
     for(i=1; i<plots.length; i++)
@@ -168,7 +298,7 @@ function draw(e)
   {
     plots.push({x: Cordx, y: Cordy});
   
-    drawOnCanvas("#ff0000",plots);
+    drawOnCanvas(plots);
   }
   else if(isActive == 3)
   {
